@@ -66,6 +66,9 @@ var getFriendlyName = function(call) {
             return 'Restraining Order Violation'
         case 'CRUELTY ANIMAL':
             return 'Animal Cruelty'
+        case 'ROBBERY ARMED':
+            return 'Armed Robbery'
+        
         default:
             return call.toTitleCase();
     }
@@ -80,6 +83,7 @@ casper.start('http://itmdapps.milwaukee.gov/MPDCallData/currentCADCalls/callsSer
         },
         calls: []
     };
+    //Get Data We Need for Meta and Paging
     this.echo("Beginning Scrape...");
     output.meta.last_updated = this.fetchText('span[id="formId:updatedId"]');
     output.meta.num_calls = parseInt(this.fetchText('span[id="formId:textTotalCallId"]').substring(25));
