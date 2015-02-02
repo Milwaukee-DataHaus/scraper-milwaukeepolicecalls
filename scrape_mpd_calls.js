@@ -7,13 +7,13 @@ String.prototype.toTitleCase = function() {
         return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
     });
 };
-//Friendly Nature of Call
+//Friendly Nature of Call Descriptions
 var getFriendlyName = function(call) {
     switch (call) {
         case 'ACC PDO':
             return 'Accident (Property Damange Only)'
         case 'ACC PI':
-            return 'Accident (Person Injured)'
+            return 'Accident (Injuries)'
         case 'BATTERY DV':
             return 'Battery (Domestic Violence)'
         case 'WELFARE CHK':
@@ -52,11 +52,21 @@ var getFriendlyName = function(call) {
             return 'Accident (Injuries Unknown)'
         case 'INJ/SICK PERS':
             return 'Injured/Sick Person'
+        case 'HOSP GUARD':
+            return 'Hospital Guard'
+        case 'PRISONER TRANS':
+            return 'Prisoner Transport'
+        case 'REPORTS STATION':
+            return 'Report to Station'
+        case 'RETURN STATION':
+            return 'Return to Station'
+        case 'SPECIAL ASSIGN':
+            return 'Special Assignment'
         default:
             return call.toTitleCase();
     }
 };
-//Prepare Casper
+//Prepare Casper Tasks
 casper.start('http://itmdapps.milwaukee.gov/MPDCallData/currentCADCalls/callsService.faces', function() {
     //Output Array
     var output = {
@@ -69,7 +79,8 @@ casper.start('http://itmdapps.milwaukee.gov/MPDCallData/currentCADCalls/callsSer
     this.echo("Beginning Scrape...");
     output.meta.last_updated = this.fetchText('span[id="formId:updatedId"]');
     output.meta.num_calls = parseInt(this.fetchText('span[id="formId:textTotalCallId"]').substring(25));
-    var pages = Math.round(output.meta.num_calls / 20);
+    var pages = parseInt(this.fetchText('span[id="formId:tableExUpdateId:deluxe1__pagerText"]').substring(9));
+    //Loop Through Pages and Scrape Data
     this.repeat(pages, function() {
         var callsForService = this.getElementsInfo('table[class="dataTableEx"] tbody tr[class^="rowClass"]');
         for (var i = 0; i < callsForService.length; i++) {
@@ -83,9 +94,14 @@ casper.start('http://itmdapps.milwaukee.gov/MPDCallData/currentCADCalls/callsSer
             tempCall['status'] = callInfo[5];
             output.calls.push(tempCall);
             this.echo("Processing Call " + tempCall['call_number']);
-            fs.write("mpd_calls_for_service.json", JSON.stringify(output, null, 4), 'w');
         }
+        //Click to Go to The Next Page
         this.click('input[id="formId:tableExUpdateId:deluxe1__pagerNext"]');
+    });
+    //Write JSON File and End Tasks
+    this.then(function() {
+        fs.write("mpd_calls_for_service.json", JSON.stringify(output, null, 4), 'w');
+        this.echo("Scrape Complete!");
     });
 });
 //Run Casper
