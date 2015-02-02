@@ -62,6 +62,10 @@ var getFriendlyName = function(call) {
             return 'Return to Station'
         case 'SPECIAL ASSIGN':
             return 'Special Assignment'
+        case 'VIOL REST ORDER':
+            return 'Restraining Order Violation'
+        case 'CRUELTY ANIMAL':
+            return 'Animal Cruelty'
         default:
             return call.toTitleCase();
     }
