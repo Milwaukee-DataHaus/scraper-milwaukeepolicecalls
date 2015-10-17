@@ -1,6 +1,6 @@
 Milwaukee Police Calls for Service Scraper
 ===========================
-The Milwaukee Police Department publishes a list of dispatched calls for service on the City of Milwaukee website in an effort to provide transparent data and policing. However, this is done using a software product that offers no APIs. This CasperJS script changes that, scraping the list of calls and transforming it to a JSON file. Also, it provides more friendly call descriptions and formats addresses. This is used by the Milwaukee DataHaus for processing and storing Milwaukee Police Calls for Service.
+The Milwaukee Police Department publishes a list of dispatched calls for service on the City of Milwaukee website in an effort to provide transparency to the community. However, this is done using a software product that offers no APIs. This CasperJS script changes that, scraping the list of calls and transforming it to a JSON file. Also, it provides more friendly call descriptions and formats addresses. This is used by the Milwaukee DataHaus for processing and storing Milwaukee Police Calls for Service.
 
 Technologies Used
 -----------------
