@@ -1,113 +1,34 @@
-//Include Modules
+//Include Modules and Files
 var casper = require('casper').create();
 var fs = require('fs');
+var system = require('system');
+var replacements = require('call_replacements.json');
+
+//File Path
+var curFilePath = fs.absolute(system.args[3]).split('/');
+
+if (curFilePath.length > 1) {
+    curFilePath.pop();
+    curFilePath = curFilePath.join('/');
+}
+
 //Title Case
 String.prototype.toTitleCase = function() {
     return this.replace(/\w\S*/g, function(txt) {
         return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
     });
 };
+
 //Friendly Nature of Call Descriptions
 var getFriendlyName = function(call) {
-    switch (call) {
-        case 'ACC PDO':
-            return 'Accident (Property Damange Only)'
-        case 'ACC PI':
-            return 'Accident (Injuries)'
-        case 'BATTERY DV':
-            return 'Battery (Domestic Violence)'
-        case 'WELFARE CHK':
-            return 'Welfare Check'
-        case 'SUSP PERS/AUTO':
-            return 'Suspicious Person in Vehicle'
-        case 'SUBJ WANTED':
-            return 'Subject Wanted'
-        case 'OAI/INTOX DRIVER':
-            return 'Intoxicated Driver'
-        case 'SUBJ STOP':
-            return 'Subject Stopped'
-        case 'TRBL W/SUBJ':
-            return 'Trouble With Subject'
-        case 'SUBJ DOWN':
-            return 'Subject Down'
-        case 'SUBJ W/WEAP':
-            return 'Subject With a Weapon'
-        case 'SUBJ W/GUN':
-            return 'Subject With a Gun'
-        case 'BUS INV':
-            return 'Business Investigation'
-        case 'SHOTSPOTTER':
-            return 'ShotSpotter'
-        case 'VEHICLE MAINT':
-            return 'Vehicle Maintenance'
-        case 'LANDLORD/TEN TRB':
-            return 'Landlord / Tenant Trouble'
-        case 'RECK USE OF WEAP':
-            return 'Reckless Use of Weapon'
-        case 'LOUD MUSIC - RES':
-            return 'Loud Music (Residence)'
-        case 'LOUD MUSIC - VEH':
-            return 'Loud Music (Vehicle)'
-        case 'LOUD MUSIC - OTH':
-            return 'Loud Music (Other)'
-        case 'ACC UNK INJ':
-            return 'Accident (Injuries Unknown)'
-        case 'ACC PI HWY':
-            return 'Accident on Highway (Injuries)'
-        case 'ACC UNK INJ HWY':
-            return 'Accident on Highway (Injuries Unknown)'
-        case 'INJ/SICK PERS':
-            return 'Injured/Sick Person'
-        case 'HOSP GUARD':
-            return 'Hospital Guard'
-        case 'PRISONER TRANS':
-            return 'Prisoner Transport'
-        case 'REPORTS STATION':
-            return 'Report to Station'
-        case 'RETURN STATION':
-            return 'Return to Station'
-        case 'SPECIAL ASSIGN':
-            return 'Special Assignment'
-        case 'VIOL REST ORDER':
-            return 'Restraining Order Violation'
-        case 'CRUELTY ANIMAL':
-            return 'Animal Cruelty'
-        case 'ROBBERY ARMED':
-            return 'Armed Robbery'
-        case 'TS TARGETED':
-            return 'Traffic Stop'
-        case 'ROBBERY ST ARM':
-            return 'Strong-Armed Robbery'
-        case 'THEFT VEHICLE':
-            return 'Stolen Vehicle'
-        case 'IND EXPOSURE':
-            return 'Indecent Exposure'
-        case 'MEET PD/OTHER':
-            return 'Other'
-        case 'PROBATION/PAROLE':
-            return 'Probation/Parole'
-        case 'VACANT HOUSE CHK':
-            return 'Vacant House Check'
-        case 'TRBL W/JUV':
-            return 'Trouble With Juvenile'
-        case 'BOAT_STOP':
-            return 'Boat Stop'
-        case 'COMMUNITY MTNG':
-            return 'Community Meeting'
-        case 'MED RUN':
-            return 'Medical Run'
-        case 'ABAND PROPERTY':
-            return 'Abandoned Property'
-        case 'SCHL PRESENTATIO':
-            return 'School Presentation'
-        case 'SCHL MONITORING':
-            return 'School Monitoring'
-        case 'SCHL PRESENTATIO':
-            return 'School Presentation'
-        default:
-            return call.toTitleCase();
+    if(replacements.hasOwnProperty(call)) {
+        return replacements[call];
+    }
+    else {
+        return call.toTitleCase();
     }
 };
+
 //Prepare Casper Tasks
 casper.start('http://itmdapps.milwaukee.gov/MPDCallData/currentCADCalls/callsService.faces', function() {
     //Output Array
@@ -152,9 +73,12 @@ casper.start('http://itmdapps.milwaukee.gov/MPDCallData/currentCADCalls/callsSer
     });
     //Write JSON File and End Tasks
     this.then(function() {
-        fs.write("/datahaus/mpd_calls_for_service/mpd_calls_for_service.json", JSON.stringify(output, null, 4), 'w');
-        this.echo("Data Collection Complete!");
+        fs.write(curFilePath + "/mpd_calls_for_service.json", JSON.stringify(output, null, 4), 'w');
     });
 });
-//Run Casper
-casper.run();
+
+//Run Casper, Exit on Complete
+casper.run(function() {
+    this.echo("MPD Scrape Complete!");
+    this.exit();
+});
