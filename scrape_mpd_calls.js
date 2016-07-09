@@ -57,6 +57,8 @@ casper.start('http://itmdapps.milwaukee.gov/MPDCallData/currentCADCalls/callsSer
                 addressParts[1] = "Milwaukee";
             } else if (addressParts[1] == "WMW") {
                 addressParts[1] = "West Milwaukee";
+            } else if (addressParts[1] == "WA") {
+                addressParts[1] = "West Allis";
             }
             tempCall['city'] = addressParts[1].toTitleCase();
             tempCall['state'] = "WI";
